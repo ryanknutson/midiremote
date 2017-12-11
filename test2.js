@@ -7,12 +7,13 @@ app.use(express.bodyParser());
 
 
 app.post('/search', function(req, res){
-	console.log(getTitles(req.body.search));
+	getTitles(req.body.search, res);
 	//res.send(req.body);
+	//res.send(200);
 });
 
 
-function getTitles(search) {
+function getTitles(search, res) {
     var regex = reg(search);
     var results = [];
     
@@ -28,15 +29,11 @@ function getTitles(search) {
             
             m.forEach((match, groupIndex) => {
                 results.push(match);
+                
             });
         }
-        
-        return results;
-        
+        res.send(results);
     });
-    
-    return results;
-
 }
 
 function reg(input) {
