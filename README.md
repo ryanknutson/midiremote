@@ -1,22 +1,19 @@
+# midiremote
+#### Play midi files on a hardware device remotely
 
-     ,-----.,--.                  ,--. ,---.   ,--.,------.  ,------.
-    '  .--./|  | ,---. ,--.,--. ,-|  || o   \  |  ||  .-.  \ |  .---'
-    |  |    |  || .-. ||  ||  |' .-. |`..'  |  |  ||  |  \  :|  `--, 
-    '  '--'\|  |' '-' ''  ''  '\ `-' | .'  /   |  ||  '--'  /|  `---.
-     `-----'`--' `---'  `----'  `---'  `--'    `--'`-------' `------'
-    ----------------------------------------------------------------- 
+### Setup
+ - You'll need node, npm, and alsa-utils. Install them with:
+`sudo apt install nodejs npm alsa-utils`
 
+- To create a list of your midi files, go into the directory where they reside and run this command:
+`find -L "$(pwd)" -not -path '*/\.*' -name "*.mid" > midilist.txt`
 
-Welcome to your Node.js project on Cloud9 IDE!
+- To find the hardware address of your midi device(s) run:
+`aplaymidi -l`
+and change the value of 'midiport' in server.js
 
-This chat example showcases how to use `socket.io` with a static `express` server.
+- If desired, change 'port' in server.js (this is the port that the web server runs on, default 8080)
 
-## Running the server
+- Clone this repo and cd into it and run `npm install`
 
-1) Open `server.js` and start the app by clicking on the "Run" button in the top menu.
-
-2) Alternatively you can launch the app from the Terminal:
-
-    $ node server.js
-
-Once the server is running, open the project in the shape of 'https://projectname-username.c9users.io/'. As you enter your name, watch the Users list (on the left) update. Once you press Enter or Send, the message is shared with all connected clients.
+- Run `node midiremote`
