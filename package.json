@@ -1,15 +1,23 @@
 {
-  "name": "chat-example",
-  "version": "0.0.0",
-  "description": "A chat example to showcase how to use `socket.io` with a static `express` server with `async` for control flow.",
-  "main": "server.js",
-  "repository": "",
-  "author": "Mostafa Eweda <mo.eweda@gmail.com>",
+  "name": "midiremote",
+  "version": "1.0.0",
+  "description": "Play midi files on a hardware device remotely",
+  "main": "midiremote.js",
+  "repository" :{
+    "type" : "git", 
+    "url" : "https://github.com/ryanknutson/midiremote.git"
+  },
+  "homepage": "",
+  "license": "MIT",
+  "keywords": [
+    "midi"
+  ],
+  "author": "Ryan D. Knutson ryanknut@me.com",
   "dependencies": {
-    "async": "~0.2.8",
+    "colors": "^1.1.2",
     "express": "~3.2.4",
     "node-cmd": "^3.0.0",
     "pug": "^2.0.0-rc.4",
-    "socket.io": "~0.9.14"
+    "shell-escape": "^0.2.0"
   }
 }

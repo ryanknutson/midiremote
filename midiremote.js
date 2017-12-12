@@ -1,38 +1,56 @@
 var express = require('express');
 var fs = require('fs');
 var path = require("path");
+var colors = require('colors');
+var exec = require('child_process').exec;
+var shellescape = require('shell-escape');
 var app = express();
-
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
-// Port the server runs on
+
+
+// Port the web server runs on
 var port = 8080;
 
+// you can find this by typing aplaymidi -l
+var midiport = "28:0";
 
+
+
+//               //
+// Begin Program //
+//               //
 
 app.use(express.bodyParser());
 
+
+// return song titles with ajax post
 app.post('/search', function(req, res){
 	getTitles(req.body.search, res);
 });
 
+// play titles with ajax post
 app.post('/play', function(req, res){
 	console.log('playing...', req.body.file);
+	playmusic(req.body.file);
 	res.send(200,{"Content-Type": "application/json"});
 });
 
+// render homepage
 app.get('/', function (req, res) {
   res.render("index");
 });
 
 
-
+// function to get song titles from text file using a search query
 function getTitles(search, res) {
     
+    // init vars
     var regex = reg(search);
     var results = [];
     
+    // read list of files
     fs.readFile("midilist.txt", "utf8", function(err, data) {
         if (err) throw err;
         
@@ -46,8 +64,8 @@ function getTitles(search, res) {
             }
             
             m.forEach((match, groupIndex) => {
+                // add matches to array
                 results.push(match);
-                
             });
         }
         
@@ -58,11 +76,27 @@ function getTitles(search, res) {
 
 
 function reg(input) {
-    var flags;
-    //could be any combination of 'g', 'i', and 'm'
-    flags = 'gi';
+    var flags = 'gi';
     return new RegExp('.*' + input + '.*', flags);
 }
+
+
+function playmusic(file) {
+    var command = [];
+    command.push('aplaymidi');
+    
+    command.push('--port=' + midiport);
+    
+    command.push(file);
+    
+    var escaped = shellescape(command);
+    exec(escaped, function (error, stdout, stderr) {
+      console.log(colors.green(stdout));
+      if (error !== null) {
+        console.log(colors.red(error));
+      }
+    }
+)}
 
 
 console.log("Started on port", port);
