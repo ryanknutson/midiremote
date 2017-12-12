@@ -18,13 +18,19 @@ html(lang='en')
         .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
         .github-corner {z-index: 400;}
         .navbar {position: initial;}
-        .container {margin-top: 5%;}   
+        .container {margin-top: 5%;}  
+        .form-control {display: initial; width: initial;}
 
     nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse
       a.navbar-brand(href='#') midiremote
     .container
       div
-        h1 midiremote
+        .row
+          .col-xs-4
+            h1 midiremote
+          .col-xs-2.offset-xs-2
+            button.btn.btn-primary.stop Stop Playing
+          
         form.searchform
           .form-group.row
             label.col-sm-2.col-form-label Search for Music
@@ -34,49 +40,72 @@ html(lang='en')
       div
         h2.status
         table.table.results(style='width:100%')
-
-      
-
     
     script(src='//code.jquery.com/jquery-3.1.1.min.js', type="text/javascript")
     script(src='//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js', type="text/javascript")
     script(src='//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js', type="text/javascript")
-    // IE10 viewport hack for Surface/desktop Windows 8 bug
-    script(src='../../assets/js/ie10-viewport-bug-workaround.js', type="text/javascript")
     script.
       $( document ).ready(function() {
+      
+        $(".stop").click(function() {
+            $.post( "/stop", function(data, status) {
+
+                if (status == 'success') {
+                  $('.status').text('Song stopped').fadeIn('slow').delay(3000).fadeOut('slow');
+                } else {
+                  $('.status').text(status).fadeIn('slow').delay(3000).fadeOut('slow');
+                  alert(status)
+                }
+              
+            });
+        });
 
         $( ".searchform" ).submit(function( event ) {
           var query = $('#query').val();
           
-          $.post("/search", {
-              search: query
-          },
-          function(data, status){
-          if (!$.trim(data)){   
-            $('.status').text('No results');
-          } else {
-            $('.status').empty();
+          if (query === '') {
+            $('.status').text('Please enter a search term');
+            return false;
           }
-              $('.results').empty();
-              $.each(data, function( index, value ) {
-              var write = `
-                <tr>
-                  <td>${value.split('/').pop()}</td>
-                  <td><button class="btn btn-primary resultplay" href="#/" data-file="${value}">Button</button></td>
-                <tr>
-              `;
-              	$( ".results" ).append(write);
-              }), 
-                $(".resultplay").on("click", function(){
-                    var file = $(this).data('file');
-                    $.post("/play", {'file': file}, function(data, status){
-                        $('.status').text(status);
-                    });
-              });
-
-          });
           
+          // I really need to fix this callback hell
+          
+              $.post("/search", {
+                  search: query
+              }, function(data, status){
+              
+                      // set status
+                      if (!$.trim(data)){   
+                        $('.status').text('No results');
+                      } else {
+                        $('.status').empty();
+                      }
+                      
+                      
+                      $('.results').empty();
+                      
+                      
+                      $.each(data, function( index, value ) {
+                          var write = `
+                            <tr>
+                              <td>${value.split('/').pop()}</td>
+                              <td><button class="btn btn-primary resultplay" href="#/" data-file="${value}">Play</button></td>
+                            <tr>
+                          `;
+                          	$( ".results" ).append(write);
+                      }),
+                      
+                      
+                      $(".resultplay").on("click", function(){
+                            var file = $(this).data('file');
+                            $.post("/play", {'file': file}, function(data, status){
+                                $('.status').text(status).fadeIn('slow').delay(3000).fadeOut('slow');
+                            });
+                      });
+    
+              });
+            
+            
           event.preventDefault();
         });
         

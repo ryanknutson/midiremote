@@ -37,6 +37,13 @@ app.post('/play', function(req, res){
 	res.send(200,{"Content-Type": "application/json"});
 });
 
+app.post('/stop', function(req, res){
+    console.log('stopping...');
+    stopmusic();
+    // I need to fix this with a callback from stopmusic()
+    res.send(200,{"Content-Type": "application/json"});
+});
+
 // render homepage
 app.get('/', function (req, res) {
   res.render("index");
@@ -89,9 +96,7 @@ function playmusic(file) {
     
     command.push(file);
 
-    var akill = "pkill aplaymidi";
-
-    exec(akill);
+    stopmusic();
     
     var escaped = shellescape(command);
     exec(escaped, function (error, stdout, stderr) {
@@ -99,8 +104,18 @@ function playmusic(file) {
       if (error !== null) {
         console.log(colors.red(error));
       }
-    }
-)}
+    });
+}
+
+
+function stopmusic() {
+    exec("pkill aplaymidi", function (error, stdout, stderr) {
+      console.log(colors.green(stdout));
+      if (error !== null) {
+        console.log(colors.red(error));
+      }
+    });
+}
 
 
 console.log("Started on port", port);
