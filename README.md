@@ -10,6 +10,8 @@
 
   `find -L "$(pwd)" -not -path '*/\.*' -name "*.mid" > midilist.txt`
   
+  move `midilist.txt` into the repo
+  
 
 - To find the hardware address of your midi device(s) run:
 
