@@ -11,7 +11,7 @@ app.set("views", path.join(__dirname, "views"));
 
 
 // Port the web server runs on
-var port = 8080;
+var port = 8085;
 
 // you can find this by typing aplaymidi -l
 var midiport = "28:0";
@@ -88,6 +88,10 @@ function playmusic(file) {
     command.push('--port=' + midiport);
     
     command.push(file);
+
+    var akill = "pkill aplaymidi";
+
+    exec(akill);
     
     var escaped = shellescape(command);
     exec(escaped, function (error, stdout, stderr) {
