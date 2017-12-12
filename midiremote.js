@@ -33,15 +33,20 @@ app.post('/search', function(req, res){
 // play titles with ajax post
 app.post('/play', function(req, res){
 	console.log('playing...', req.body.file);
-	playmusic(req.body.file);
-	res.send(200,{"Content-Type": "application/json"});
+	playmusic(res, req.body.file);
+	//res.send(200,{"Content-Type": "application/json"});
 });
 
 app.post('/stop', function(req, res){
     console.log('stopping...');
-    stopmusic();
+    stopmusic(res, 1);
     // I need to fix this with a callback from stopmusic()
-    res.send(200,{"Content-Type": "application/json"});
+    //res.send(200,'success');
+    
+    //res.status(500).send('Sorry, we cannot find that!');
+    
+    //res.status(500).json({ error: 'message' });
+    //res.send(200,{"Content-Type": "application/json"});
 });
 
 // render homepage
@@ -88,7 +93,7 @@ function reg(input) {
 }
 
 
-function playmusic(file) {
+function playmusic(res, file) {
     var command = [];
     command.push('aplaymidi');
     
@@ -101,19 +106,29 @@ function playmusic(file) {
     var escaped = shellescape(command);
     exec(escaped, function (error, stdout, stderr) {
       console.log(colors.green(stdout));
+      res.status(200).send(stdout);
       if (error !== null) {
         console.log(colors.red(error));
+        res.status(500).send(error);
       }
     });
 }
 
 
-function stopmusic() {
+function stopmusic(res, z) {
+    z = z || 0;
+
     exec("pkill aplaymidi", function (error, stdout, stderr) {
+    // Send response
       console.log(colors.green(stdout));
+      
       if (error !== null) {
         console.log(colors.red(error));
+        if (z == 1) { res.status(500).send(error); }
+      } else {
+        if (z == 1) { res.status(200).send('Music stopped'); }
       }
+      
     });
 }
 

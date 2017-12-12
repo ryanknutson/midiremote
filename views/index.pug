@@ -48,17 +48,20 @@ html(lang='en')
       $( document ).ready(function() {
       
         $(".stop").click(function() {
-            $.post( "/stop", function(data, status) {
-
-                if (status == 'success') {
-                  $('.status').text('Song stopped').fadeIn('slow').delay(3000).fadeOut('slow');
-                } else {
-                  $('.status').text(status).fadeIn('slow').delay(3000).fadeOut('slow');
-                  alert(status)
+            $.ajax({
+                type : "POST",
+                url : '/stop',
+                contentType : "text",
+                dataType: "application/json; charset=utf-8",
+                success : function(data) {
+                    alert(data);
+                },
+                error : function(data) {
+                     $('.status').text(data.responseText);
                 }
-              
             });
         });
+
 
         $( ".searchform" ).submit(function( event ) {
           var query = $('#query').val();
