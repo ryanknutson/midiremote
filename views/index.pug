@@ -97,12 +97,12 @@ html(lang='en')
           } $('.results').empty();
           
           $.each(data, function( index, value ) {
-              var write = `
-                <tr>
-                  <td class="nobreak">${value.split('/').pop()}</td>
-                  <td class="nobreak"><button class="btn btn-primary resultplay" href="#/" data-file="${value}">Play</button></td>
-                <tr>
-              `;
+              var write =
+              '\n<tr>\n<td class="nobreak">' +
+              value.split("/").pop() +
+              '</td>\n<td class="nobreak"><button class="btn btn-primary resultplay" href="#/" data-file="' +
+              value +
+              '">Play</button></td>\n<tr>\n';
               	$( ".results" ).append(write);
           }),
           $(".resultplay").on("click", function(){

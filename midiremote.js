@@ -26,24 +26,24 @@ app.use(express.bodyParser());
 
 
 // return song titles with ajax post
-app.post('/search', function(req, res){
+app.post('/search', (req, res) => {
 	getTitles(req.body.search, res);
 });
 
 
 // play titles with ajax post
-app.post('/play', function(req, res){
+app.post('/play', (req, res) => {
 	console.log('playing', req.body.file);
 	playmusic(res, req.body.file);
 });
 
-app.post('/stop', function(req, res){
+app.post('/stop', (req, res) => {
     console.log('stopping music...');
     stopmusic(res, 1);
 });
 
 // render homepage
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
     res.render("index");
 });
 
@@ -56,7 +56,7 @@ function getTitles(search, res) {
     var results = [];
     
     // read list of files
-    fs.readFile("midilist.txt", "utf8", function(err, data) {
+    fs.readFile("midilist.txt", "utf8", (err, data) => {
         if (err) {
             res.status(500).send("<span style=\"color: red;\">" + err + "</span>");    
             throw err;
@@ -100,7 +100,7 @@ function playmusic(res, file) {
     stopmusic();
     
     var escaped = shellescape(command);
-    exec(escaped, function (error, stdout, stderr) {
+    exec(escaped, (error, stdout, stderr) => {
       console.log(colors.green(stdout));
       if (error !== null) {
         console.log(colors.red(error));
@@ -115,7 +115,7 @@ function playmusic(res, file) {
 function stopmusic(res, z) {
     z = z || 0;
 
-    exec("pkill aplaymidi", function (error, stdout, stderr) {
+    exec("pkill aplaymidi", (error, stdout, stderr) => {
     // Send response
       console.log(colors.green(stdout));
       
