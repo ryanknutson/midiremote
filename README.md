@@ -20,7 +20,7 @@
    and change the value of 'midiport' in server.js
 
 
-- If desired, change 'port' in server.js (this is the port that the web server runs on, default 8085)
+- If desired, change 'port' (this is the port that the web server runs on, default 3000)
 
 - Clone this repo and cd into it and run:
   

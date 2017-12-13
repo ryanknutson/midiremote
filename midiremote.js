@@ -11,7 +11,7 @@ app.set("views", path.join(__dirname, "views"));
 
 
 // Port the web server runs on
-var port = 8085;
+var port = process.env.PORT || 3000;
 
 // you can find this by typing aplaymidi -l
 var midiport = "28:0";
@@ -30,28 +30,21 @@ app.post('/search', function(req, res){
 	getTitles(req.body.search, res);
 });
 
+
 // play titles with ajax post
 app.post('/play', function(req, res){
-	console.log('playing...', req.body.file);
+	console.log('playing', req.body.file);
 	playmusic(res, req.body.file);
-	//res.send(200,{"Content-Type": "application/json"});
 });
 
 app.post('/stop', function(req, res){
-    console.log('stopping...');
+    console.log('stopping music...');
     stopmusic(res, 1);
-    // I need to fix this with a callback from stopmusic()
-    //res.send(200,'success');
-    
-    //res.status(500).send('Sorry, we cannot find that!');
-    
-    //res.status(500).json({ error: 'message' });
-    //res.send(200,{"Content-Type": "application/json"});
 });
 
 // render homepage
 app.get('/', function (req, res) {
-  res.render("index");
+    res.render("index");
 });
 
 
@@ -64,7 +57,10 @@ function getTitles(search, res) {
     
     // read list of files
     fs.readFile("midilist.txt", "utf8", function(err, data) {
-        if (err) throw err;
+        if (err) {
+            res.status(500).send("<span style=\"color: red;\">" + err + "</span>");    
+            throw err;
+        }
         
         // set a variable to make things shorter
         let m;
@@ -106,10 +102,11 @@ function playmusic(res, file) {
     var escaped = shellescape(command);
     exec(escaped, function (error, stdout, stderr) {
       console.log(colors.green(stdout));
-      res.status(200).send(stdout);
       if (error !== null) {
         console.log(colors.red(error));
-        res.status(500).send(error);
+        res.status(500).send("<span style=\"color: red;\">error playing " + file.split('/').pop() + "</span>");
+      } else {
+        res.status(200).send("playing " + file.split('/').pop());
       }
     });
 }
@@ -124,7 +121,7 @@ function stopmusic(res, z) {
       
       if (error !== null) {
         console.log(colors.red(error));
-        if (z == 1) { res.status(500).send(error); }
+        if (z == 1) { res.status(500).send("<span style=\"color: red;\">" + error + "</span>"); }
       } else {
         if (z == 1) { res.status(200).send('Music stopped'); }
       }

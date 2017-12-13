@@ -20,23 +20,25 @@ html(lang='en')
         .navbar {position: initial;}
         .container {margin-top: 5%;}  
         .form-control {display: initial; width: initial;}
+        .nobreak {
+          word-break: break-word;
+        }
 
     nav.navbar.navbar-toggleable-md.navbar-inverse.bg-inverse
       a.navbar-brand(href='#') midiremote
     .container
-      div
-        .row
-          .col-xs-4
-            h1 midiremote
-          .col-xs-2.offset-xs-2
-            button.btn.btn-primary.stop Stop Playing
-          
-        form.searchform
-          .form-group.row
-            label.col-sm-2.col-form-label Search for Music
-            .col-sm-10
-              input#query.form-control(placeholder='Search')
-              button.btn.btn-primary(type='submit') Search
+      .row
+        .col-md-4
+          h1 midiremote
+        .col-md-4
+          button.btn.btn-primary.stop.mr-auto Stop Playing
+        
+      form.searchform
+        .form-group.row
+          label.col-sm-2.col-form-label Search for Music
+          .col-sm-10
+            input#query.form-control(placeholder='Search')
+            button.btn.btn-primary(type='submit') Search
       div
         h2.status
         table.table.results(style='width:100%')
@@ -47,69 +49,72 @@ html(lang='en')
     script.
       $( document ).ready(function() {
       
-        $(".stop").click(function() {
-            $.ajax({
-                type : "POST",
-                url : '/stop',
-                contentType : "text",
-                dataType: "application/json; charset=utf-8",
-                success : function(data) {
-                    alert(data);
-                },
-                error : function(data) {
-                     $('.status').text(data.responseText);
-                }
-            });
-        });
-
-
-        $( ".searchform" ).submit(function( event ) {
-          var query = $('#query').val();
-          
-          if (query === '') {
-            $('.status').text('Please enter a search term');
-            return false;
-          }
-          
-          // I really need to fix this callback hell
-          
-              $.post("/search", {
-                  search: query
-              }, function(data, status){
-              
-                      // set status
-                      if (!$.trim(data)){   
-                        $('.status').text('No results');
-                      } else {
-                        $('.status').empty();
-                      }
-                      
-                      
-                      $('.results').empty();
-                      
-                      
-                      $.each(data, function( index, value ) {
-                          var write = `
-                            <tr>
-                              <td>${value.split('/').pop()}</td>
-                              <td><button class="btn btn-primary resultplay" href="#/" data-file="${value}">Play</button></td>
-                            <tr>
-                          `;
-                          	$( ".results" ).append(write);
-                      }),
-                      
-                      
-                      $(".resultplay").on("click", function(){
-                            var file = $(this).data('file');
-                            $.post("/play", {'file': file}, function(data, status){
-                                $('.status').text(status).fadeIn('slow').delay(3000).fadeOut('slow');
-                            });
-                      });
-    
+          $(".stop").click(function() {
+              $.ajax({
+                  type : "POST",
+                  url : '/stop',
+                  contentType : "text",
+                  dataType: "application/json; charset=utf-8",
+                  success : function(data) {
+                      alert(data);
+                  },
+                  error : function(data) {
+                       $('.status').html(data.responseText);
+                  }
               });
+          });
+
+
+          $( ".searchform" ).submit(function( event ) {
+            var query = $('#query').val();
+            
+            if (query === '') {
+              $('.status').text('Please enter a search term');
+              return false;
+            }
             
             
-          event.preventDefault();
-        });
-        
+            $.post( "/search", {search: query})
+            .done(function( data ) {
+                writetotable(data);
+            })
+            .fail(function( data ) {
+                $('.status').text(data.responseText);
+            });
+            
+            
+            event.preventDefault();
+          });
+          
       });
+      
+      
+      function writetotable(data) {
+          if (!$.trim(data)){   
+            $('.status').text('No results');
+          } else {
+            $('.status').empty();
+          } $('.results').empty();
+          
+          $.each(data, function( index, value ) {
+              var write = `
+                <tr>
+                  <td class="nobreak">${value.split('/').pop()}</td>
+                  <td class="nobreak"><button class="btn btn-primary resultplay" href="#/" data-file="${value}">Play</button></td>
+                <tr>
+              `;
+              	$( ".results" ).append(write);
+          }),
+          $(".resultplay").on("click", function(){
+                var file = $(this).data('file');
+                
+                $.post( "/play", {'file': file})
+                .done(function( data ) {
+                    $('.status').text(data);
+                })
+                .fail(function( data ) {
+                    $('.status').html(data.responseText);
+                });
+        
+          });
+      }
